@@ -246,40 +246,7 @@ class RootWidget(BoxLayout):
                 for p in factor.ProdsJoined:
                     for d in p.Right:
                         self.leftFact.text+=str(p.Left)+'-->'+str(d)+'\n'
-                # for p in factor.ProdsJoined:
-                #     for d in p.Right:
-                #         self.leftRecursion.text+=str(p.Left)+'-->'+str(d)+'\n'
-
-
-
-
-                # myGrammar.leftFactorize()
-                # print('After Killing Recursion On Left: ')
-                # for p in myGrammar.ProdsJoined:
-                #     print(p)
-                #     print('\n')
-
-                # p=myGrammar.Primero()
-                # for var in p:
-                #     print(var)
-
-                # myGrammar.Sig()
-                # print(myGrammar.SiguienteSet)
-                # myGrammar.VT.append('$')
-
-                # table=myGrammar.tabla()
-                # print('tabla')
-
-                # for col in myGrammar.VT:
-                #     print(col+'     ')
-
-                # for ren in range(len(table)): 
-                #     print(myGrammar.VN[ren])                   
-                #     for col in range(len(table[ren])):
-                #         print(table[ren][col]+'    ')
-                #         print('\n')
-
-                # print(table)
+                
 
 
 
