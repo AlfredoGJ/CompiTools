@@ -1,0 +1,32 @@
+digraph {
+	graph [bgcolor="#333333" fontcolor=white fontsize=32 rankdir=LR]
+	node [color=white fillcolor="#006699" fontcolor=white fontname=Helvetica fontsize=28 style=filled]
+	edge [arrowhead=open color=white fontcolor="#dabded" fontname=Arial fontsize=28]
+	i
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	f
+	2 -> 3 [label=j]
+	3 -> 4 [label=k]
+	5 -> 6 [label=s]
+	6 -> 7 [label=a]
+	1 -> 2 [label="ε"]
+	1 -> 5 [label="ε"]
+	4 -> 8 [label="ε"]
+	7 -> 8 [label="ε"]
+	9 -> 10 [label=f]
+	10 -> 11 [label=h]
+	i -> 1 [label="ε"]
+	i -> 9 [label="ε"]
+	8 -> f [label="ε"]
+	11 -> f [label="ε"]
+}

@@ -1,0 +1,25 @@
+digraph {
+	graph [bgcolor="#333333" fontcolor=white fontsize=32 rankdir=LR]
+	node [color=white fillcolor="#006699" fontcolor=white fontname=Helvetica fontsize=28 style=filled]
+	edge [arrowhead=open color=white fontcolor="#dabded" fontname=Arial fontsize=28]
+	0 [label="A
+['i', '1', '2', '5', '9']"]
+	1 [label="B
+['3']"]
+	2 [label="C
+['6']"]
+	3 [label="D
+['10']"]
+	4 [label="E
+['4', '8', 'f']"]
+	5 [label="F
+['7', '8', 'f']"]
+	6 [label="G
+['11', 'f']"]
+	0 -> 1 [label=j]
+	0 -> 2 [label=s]
+	0 -> 3 [label=f]
+	1 -> 4 [label=k]
+	2 -> 5 [label=a]
+	3 -> 6 [label=h]
+}

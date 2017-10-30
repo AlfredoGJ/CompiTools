@@ -1,0 +1,250 @@
+<RootWidget>:
+# this is the rule for your root widget, defining it's look and feel.
+    orientation: 'vertical'
+    action_bar: _action
+    carousel: carousel
+    logBox:logBox
+    grammarInput: grammarInput
+    grammarInfo:grammarInfo
+    regExpression:regExpression
+    regExCarousel:regExCarousel
+    regExInputBox:regExInputBox
+    regExPostFixedBox:regExPostFixedBox
+    regAugmentedBox:regAugmentedBox
+    regExTreeImg:regExTreeImg
+    regExImage:regExImage
+    leftFact:leftFact
+    leftRecursion:leftRecursion
+    
+
+    #These are the auto provided ActionBar and Carousel, change them according
+    #to your needs
+
+    BoxLayout:
+        size_hint: (1,0.08)
+        pos_hint: {'top':1}
+
+        
+        ActionBar:
+            id: _action
+            size_hint: 1,1
+            pos_hint: {'top':1}
+            ActionView:
+                use_separator: True
+                ActionPrevious:
+                    title: 'Slide 1'
+                    with_previous: False
+                ActionOverflow:
+                    disabled: True
+                ActionButton:
+                    
+                    text: 'Go To Slide 3'
+                    on_release: carousel.index = 2
+                
+                ActionButton:
+                   
+                    text: 'REGULAR EXPRESSIONS'
+                    on_release: carousel.index = 1
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+
+            Carousel:
+                id: carousel
+                pos_hint: {'top': 0.9}
+                on_index: root.on_index(*args)
+                BoxLayout:
+                    orientation: 'horizontal'
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        padding: 5
+                        spacing: 2
+                        use_separator:True
+                        Label:
+                            text: 'TYPE YOUR GRAMMAR:'
+                            size_hint: (1, .06)
+                            # pos_hint: {'x':0,'y':.91}
+
+                        TextInput:
+                            id: grammarInput
+                            size_hint: (1, .74)
+                            # pos_hint: {'x':0,'y':.36}
+
+                        Button:
+                            text: 'Grammar Info'
+                            size_hint: (1, .1)
+                            # pos_hint: {'x':0,'y':.19}
+                            on_press: root.testGrammar()
+                        Button:
+                            text: 'Insert E (Epsilon)'
+                            size_hint: (1, .1)
+                            on_press: root.insertEpsilon()
+                            on_release: root.refocusTextInput()
+                            # pos_hint: {'x':0,'y':.02}
+                        Button:
+                            text: 'Primero, Siguiente,Tabla'
+                            size_hint: (1, .1)
+                            on_press: root.primUndDemencia()
+                    
+
+
+                      
+
+                    ScrollView:
+                        size_hint: 1.2, 1
+                        do_scroll_x: False
+                        bar_width: 6
+
+
+                        BoxLayout:
+                            orientation: 'vertical'
+                            padding: 5
+                            spacing: 2
+                            size_hint: (1,2)
+                            Label:
+                                halign: 'left'
+                                text_size: (self.width, None)
+                                text: 'Grammar Information:'
+                                size_hint: (1,.06)
+
+                            TextInput:
+                                id: grammarInfo
+                                readonly: True
+                                size_hint: (1, .4)
+
+                            Label:
+                                halign: 'left'
+                                text_size: (self.width, None)
+                                text: 'Regular Expression:'
+                                size_hint: (1,.06)
+
+                            TextInput:
+                                id: regExpression
+                                readonly: True
+                                allow_copy: True
+                                size_hint: (1, .1)
+                            
+                            Button:
+                                text:'Copy'
+                                size_hint: (1,.06)
+                                on_press: root.regExpressionCopy()
+
+                            Label:
+                                halign: 'left'
+                                text_size: (self.width, None)
+                                text: 'Left Factorized:'
+                                size_hint: (1,.06)
+
+                            TextInput:
+                                id: leftFact
+                                readonly: True
+                                allow_copy: True
+                                size_hint: (1, .4)
+
+                            Label:
+                                halign: 'left'
+                                text_size: (self.width, None)
+                                text: 'Left Recursion Free:'
+                                size_hint: (1,.06)
+
+                            TextInput:
+                                id: leftRecursion
+                                readonly: True
+                                allow_copy: True
+                                size_hint: (1, .4)
+
+                            # Button:
+                            #     text:'Relleno'
+                    
+
+
+                                            
+                # BoxLayout:
+                Carousel:
+                    # orientation: 'vertical'
+                    direction: 'bottom'
+                    id: regExCarousel
+            
+                    anchor_x: 'left'
+                    BoxLayout:
+                        orientation: 'vertical'
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint: (1, .9)
+                            BoxLayout:
+                                orientation: 'vertical'
+
+
+                                Label:
+                                    text: 'Type or Paste Regular Expression'
+                                    size_hint: (1, .1)
+                                TextInput:
+                                    id:regExInputBox
+                                    on_text:root.regExInputBoxTextInput()
+                                    size_hint: (1, .15)
+
+
+                                Label:
+                                    text: 'Post Fixed Expression'
+                                    text_size: (self.width, None)
+                                    halign: 'left'
+                                    size_hint: (1, .1)
+                                TextInput:
+                                    id:regExPostFixedBox
+                                    size_hint: (1, .15)
+
+                                Label:
+                                    text: 'Augmented Post Fixed Expression'
+                                    text_size: (self.width, None)
+                                    halign: 'left'
+                                    size_hint: (1, .1)
+                                TextInput:
+                                    id:regAugmentedBox
+                                    size_hint: (1, .15)
+
+                                
+                            Image:
+                                id:regExTreeImg
+                                size_hint: (1,1)
+
+
+                        BoxLayout:
+                            size_hint: (1,.1)
+                            orientation: 'horizontal'
+                            Button:
+                                text:'Show AFN'
+                                on_press:root.ShowAFN()
+                            Button:
+                                text:'Show AFD'
+                                on_press:root.ShowAFD()
+                            Button:
+                                text:'Show Minimum AFD'
+                                on_press:root.ShowMinAFD()
+
+
+
+
+
+                    BoxLayout:
+                        Image:
+                            id: regExImage
+                BoxLayout:
+                    Button:
+                        text: 'Slide three'
+
+        Splitter:
+            size_hint_y: .3
+            sizable_from:'top'
+            min_size: 100
+            max_size: 350
+            keep_within_parent: 'true'
+            rescale_with_parent: 'true'
+
+            TextInput:
+                id: logBox
+                readonly: True
+                size_hint: 1,1
+        
+
