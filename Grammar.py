@@ -619,15 +619,15 @@ class Grammar:
 													 # Nothing is done to the production 
 					lAux=[]					 
 					for B in Betas:
-						lAux.append(B+NT+'`')
+						lAux.append(B+'<'+NT+'`'+'>')
 					self.ProdsJoined[i].Right=lAux[0:len(lAux)]
 				
 					lAux.clear()
 					for A in Alphas:
-						lAux.append(A+NT+'`')
+						lAux.append(A+'<'+NT+'`'+'>')
 					lAux.append('ε')
 				
-					p=Production(NT+'`', lAux[0:len(lAux)]) 
+					p=Production('<'+NT+'`'+'>', lAux[0:len(lAux)]) 
 					PrimProductions.append(p)
 			self.ProdsJoined.extend(PrimProductions)
 			for V in PrimProductions:
@@ -660,12 +660,12 @@ class Grammar:
 							
 					else:
 						Gammas.append(prod)
-				P.Right=[Alpha+P.Left+'`']+Gammas
-				newP=Production(P.Left+'`',Betas) 
+				P.Right=[Alpha+'<'+P.Left+'`'+'>']+Gammas
+				newP=Production('<'+P.Left+'`'+'>',Betas) 
 				newProds.append(newP)
 		self.ProdsJoined.extend(newProds)
 		for V in newProds:
-			self.VN.append(v.Left)
+			self.VN.append(V.Left)
 		# self.Productions.extend(newProds)
 		# self.productionsJoin()
 		# self.findTermAndNotTerm()
@@ -844,6 +844,9 @@ class Grammar:
 				elif Betha[i]!='`':           #normal Not Terminal
 					X=Betha[i]
 				primerosDeI.append(self.PrimeroSet.get(X))
+
+				if 'ε'  not in primerosDeI:
+					break
 				# # for s in Aux:
 				# # 	if s not in prim:
 				# 		prim.append(s)
@@ -918,7 +921,18 @@ class Grammar:
 
 	def tabla(self):
 
+		Table={}
+		for col in self.VN:
+			Table[col]={}
 
+		for col in self.VN:
+			for row in self.VT:
+				Table[col][row]='--------'	
+
+		# print('Table PrrooodskcfvpasdvjadwlkNVDksdsj')
+		# for x in Table:
+		# 	print(Table[x])
+		# # print(Table)	
 
 		Matrix = [[0 for x in range(len(self.VT))] for y in range(len(self.VN))]
 
@@ -929,16 +943,97 @@ class Grammar:
 				for pr in primero:
 					if self.isPureTerminal(pr) and pr!='ε':
 						Matrix[self.VN.index(produccion.Left)][self.VT.index(pr)]=produccion.Left+'->'+P
+						Table[produccion.Left][pr]=[produccion.Left,P]
+
 				if 'ε' in primero:
 					siguiente=self.SiguienteSet.get(produccion.Left)
 
 					for s in siguiente:
 						if self.isPureTerminal(s):
 							Matrix[self.VN.index(produccion.Left)][self.VT.index(s)]=produccion.Left+'->'+P
+							Table[produccion.Left][s]=[produccion.Left,P]
 
 				if 'ε' in primero and '$' in siguiente:
 					Matrix[self.VN.index(produccion.Left)][self.VT.index('$')]=produccion.Left+'->'+P
-		return Matrix
+					Table[produccion.Left]['$']=[produccion.Left,P]
+		
+		print(Table)
+
+		return Table
+
+
+	def findSymbols(strng):
+		symbols=[]
+		for i  in range(len(strng)):			
+			if strng[i]!= '`':
+				if i+1< len(strng):
+					if strng[i+1]=='`':
+						symbols.append(strng[i]+strng[i+1])
+					else:
+						symbols.append(strng[i])
+				else:
+					symbols.append(strng[i])
+		return symbols
+
+
+	def belongsTo(self,strng):
+
+
+		self.Primero()
+		self.Sig()
+		Table=self.tabla()
+
+		Pila=['$',self.VN[0]]
+		strng+='$'
+		ae=0
+		X=Pila[len(Pila)-1]
+
+		logTable=[]
+
+		while X!='$':
+
+			prodEmmited=''
+			X=Pila[len(Pila)-1]
+
+			if self.isPureTerminal(X) or X=='$':
+				if X==strng[ae]:
+					prodEmmited=''
+					Pila.pop()
+					ae+=1
+				else:
+					 return False
+
+			else:
+				if  X in Table.keys():
+					if strng[ae] in Table[X].keys():
+						prod=Table[X][strng[ae]][1]
+						Pila.pop()
+						symbols=Grammar.findSymbols(prod)
+						for i in reversed(range(len(symbols))):
+							if symbols[i]!='ε':
+								Pila.append(symbols[i])
+						prodEmmited='->'.join(Table[X][strng[ae]])
+					else:
+						return False
+				else:
+					return False
+			logRen=[Pila[0:len(Pila)],strng[ae:len(strng)],prodEmmited]
+			print(logRen)
+			logTable.append(logRen)
+
+		return logTable
+
+
+
+
+
+
+
+
+		
+
+
+		
 
 
 

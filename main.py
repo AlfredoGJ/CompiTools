@@ -34,6 +34,24 @@ class RootWidget(BoxLayout):
         self.prev_index = 0
         self.from_actionbar = False
 
+    def testStringOnGrammar(self):
+
+        myGrammar=self.extractGrammar()
+        if myGrammar:
+            myGrammar.VT.append('$')
+            result=myGrammar.belongsTo(self.testString.text)
+            if result!= False:
+                self.logBox.text+='THE STRING CORRESPONDS TO THE GRAMMAR\n\n'
+                self.logBox.text+='Pila                             Cadena                            Produccion\n'
+                for r in result:
+
+                    self.logBox.text+=str(r[0])+'                          '+str(r[1])+'                         '+str(r[2])+'\n'
+            else:
+                self.logBox.text+="ERROR\nTHE STRING '"+self.testString.text+"' STRING DOESN'T CORRESPONDS TO THE GRAMMAR\n\n"
+
+
+
+
     def on_index(self, instance, value):
         if value == 2:
             self.action_bar.add_widget(self.cont2)
@@ -115,7 +133,7 @@ class RootWidget(BoxLayout):
             self.regExTreeImg.source=Tree.printStart(self.regExInputBox.text,'ERTree')
             self.regExTreeImg.reload()
 
-    def primUndDemencia(self):
+    def extractGrammar(self):
         self.regExpression.text=''
         self.logBox.text = ''
         self.grammarInfo.text = ''
@@ -139,11 +157,21 @@ class RootWidget(BoxLayout):
                     ER = myGrammar.genRegularExpression()
                     self.grammarInfo.text += '\nRegular Expresion: S--> ' + ' | '.join(ER[0])
                     self.logBox.text = ER[1]
-                    for h in ER:
-                        print(h)
 
                     self.regExpression.text=' | '.join(ER[0])
                     print(Grammar.genPostFixed(' | '.join(ER[0])))
+
+                return myGrammar
+
+
+            else:
+                self.logBox.text = myGrammar
+                return False
+
+
+    def primUndDemencia(self):
+        myGrammar=self.extractGrammar()
+        if  myGrammar:
 
                 print('After Killing Recursion On Left: ')
                 for p in myGrammar.ProdsJoined:
@@ -167,11 +195,9 @@ class RootWidget(BoxLayout):
                 for p in myGrammar.SiguienteSet:
                     self.logBox.text+=str(p)+' '+str(myGrammar.SiguienteSet.get(p))+'\n'
 
-
-                
-
                 self.logBox.text+='\n\n\n'
                 self.logBox.text+='Tabla:\n\n'
+                
                 myGrammar.VT.append('$')
                 table=myGrammar.tabla()
 
@@ -180,22 +206,19 @@ class RootWidget(BoxLayout):
                     self.logBox.text+=col+'                          '
                 self.logBox.text+='\n\n'
 
-                for ren in range(len(table)): 
-                    self.logBox.text+=(myGrammar.VN[ren])+'      '                   
-                    for col in range(len(table[ren])):
-                        self.logBox.text+=(str(table[ren][col])+'                   ')
+                for ren in table: 
+                    self.logBox.text+=ren+'      '                   
+                    for col in table[ren]:
+                        if type (table[ren].get(col)) is list:
+                            self.logBox.text+='->'.join(table[ren].get(col))+'                   '
+                        else:
+                            self.logBox.text+=table[ren].get(col)+'                   '
+                         
+
                     self.logBox.text+=('\n')
                 # for t in table:
 
                 #     self.logBox.text+=str(t)+'\n'
-
-
-
-
-
-
-            else:
-                self.logBox.text = myGrammar
        
            
 
@@ -246,7 +269,40 @@ class RootWidget(BoxLayout):
                 for p in factor.ProdsJoined:
                     for d in p.Right:
                         self.leftFact.text+=str(p.Left)+'-->'+str(d)+'\n'
-                
+                # for p in factor.ProdsJoined:
+                #     for d in p.Right:
+                #         self.leftRecursion.text+=str(p.Left)+'-->'+str(d)+'\n'
+
+
+
+
+                # myGrammar.leftFactorize()
+                # print('After Killing Recursion On Left: ')
+                # for p in myGrammar.ProdsJoined:
+                #     print(p)
+                #     print('\n')
+
+                # p=myGrammar.Primero()
+                # for var in p:
+                #     print(var)
+
+                # myGrammar.Sig()
+                # print(myGrammar.SiguienteSet)
+                # myGrammar.VT.append('$')
+
+                # table=myGrammar.tabla()
+                # print('tabla')
+
+                # for col in myGrammar.VT:
+                #     print(col+'     ')
+
+                # for ren in range(len(table)): 
+                #     print(myGrammar.VN[ren])                   
+                #     for col in range(len(table[ren])):
+                #         print(table[ren][col]+'    ')
+                #         print('\n')
+
+                # print(table)
 
 
 
