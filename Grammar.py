@@ -3,6 +3,7 @@ import string
 from Production import Production
 from Tree import Tree
 import logging
+import Util
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -34,9 +35,9 @@ class Grammar:
 	def copy(self):
 		 Aux=Grammar()
 		 Aux.VT=self.VT[0:len(self.VT)]
-		 Aux.VT=self.VN[0:len(self.VN)]
-		 # Aux.VT=self.PrimeroSet[0:len(self.PrimeroSet)]
-		 # Aux.VT=self.SiguienteSet[0:len(self.SiguienteSet)]
+		 Aux.VN=self.VN[0:len(self.VN)]
+		 Aux.PrimeroSet=self.PrimeroSet.copy()  #this section was comented, i dont know why
+		 Aux.SiguienteSet=self.SiguienteSet.copy() # but if something breaks coment it again
 
 		 Prods=[]
 		 for P in self.Productions:
@@ -222,7 +223,8 @@ class Grammar:
 						
 						return self.extractOperands(word[i+1:len(word)],symbols)
 
-					elif word[i] not in string.ascii_uppercase and word[i]!='`':  # modified for accepting prime derivations of the kind "E`"
+					elif word[i]  not in string.ascii_lowercase and word[i]!='`':  # modified for accepting prime derivations of the kind "E`"
+					
 						return 'Delimitated words must only contain UPPERCASE symbols'
 					
 				return 'Missing delimitator'
@@ -823,7 +825,7 @@ class Grammar:
 
 	def gimmePrim(self,Betha):
 		"""Finds primero for a string based on the existing primero"""
-		print('i receive as β :'+Betha)
+		# print('i receive as β :'+Betha)
 		primerosDeI=[]
 		prim=[]
 		for i in range(len(Betha)):
@@ -850,7 +852,7 @@ class Grammar:
 				# # for s in Aux:
 				# # 	if s not in prim:
 				# 		prim.append(s)
-		print('XXdfX:'+ str(primerosDeI))
+		# print('XXdfX:'+ str(primerosDeI))
 		allEpsilon=True	
 		for P in primerosDeI:
 			if 'ε' not in P:
@@ -861,7 +863,7 @@ class Grammar:
 		if not allEpsilon and 'ε' in prim:
 			prim.remove('ε')
 
-		print('an d prim of β = '+str(prim))
+		# print('an d prim of β = '+str(prim))
 		return prim
 
 
@@ -1024,6 +1026,282 @@ class Grammar:
 		return logTable
 
 
+	def CerraduraLR1(self,E,G):
+
+		for e in E:
+
+			prod=e[0]
+			print(E)
+			a=e[1]
+			Alpha=prod.getDotAlpha()
+			B=prod.dotNextChar()
+			Betha=prod.getDotBetha()
+			print("Prod:")
+			print(prod)
+			print("Alpha:")
+			print(Alpha)
+			print("B:")
+			print(B)
+			print("Betha:")
+			print(Betha)
+			print("a:")
+			print(a)
+
+
+			Prim=self.gimmePrim(Betha+a)
+			Prods=G.getProdsOf(B)
+			print("Prim Betha+a:")
+			print(Prim)
+			print("Prods of B:")
+			for k in Prods:
+				print(k)
+
+			for p in Prim:
+				for pro in Prods:
+					if  not Grammar._in(E,[pro.dotInit(),p]):
+
+						E.append([pro.dotInit(),p]) 
+						Grammar.printLRElement([pro.dotInit(),p])
+						print("Element was Added")
+		return E
+
+
+	def getProdsOf(self, NT):
+		result=[]
+		for p in self.Productions:
+			if p.Left[0]==NT:
+				result.append(p)
+		return result
+
+
+
+	def _in(E,p):
+		for e in E:
+			if p[1]==e[1] and p[0].Left==e[0].Left and p[0].Right==e[0].Right :
+					return True 
+		return False 
+
+	def ir_a(self, E, X,G):
+		J=[]
+		for e in E:
+			if e[0].dotNextChar()==X:
+				J.append([e[0].dotAdvance(),e[1]])
+		print("J:")
+		Grammar.printLRElementSet(J)
+		return self.CerraduraLR1(J,G)
+
+
+	def Elementos(self):
+		Gp=self.copy()
+		Gp.Productions.insert(0,Production([Gp.Productions[0].Left[0]+'`'],[Gp.Productions[0].Left[0]]))
+
+		print("Augmented Grammar:")
+		for p in Gp.Productions:
+			print(p)
+		
+		Elements=[]
+		firstState=self.CerraduraLR1([[Gp.Productions[0].dotInit(),'$']],Gp)
+		print("First State:")
+		Grammar.printLRElementSet(firstState)
+		Elements.append(firstState)
+	
+
+		for e in Elements:
+			print(Gp.VT+Gp.VN)
+			for t in Gp.VN+Gp.VT:
+				print("Ir_a de (E"+str(Elements.index(e))+","+t+")")
+				newSet=self.ir_a(e,t,Gp)
+				print("New state:")
+				Grammar.printLRElementSet(newSet)
+				if len(newSet)>0:
+				 	if not self.isSetIn(Elements,newSet):
+				 		Elements.append(newSet)
+				 		print("Was appenddded to element Sets")
+				 	else:
+				 		print("Element already exists in Sets")
+				else:
+					print("Element Set is empty")
+
+		return Elements
+
+
+
+
+	def isSetIn(self, sets, E):
+	
+		for s in sets:
+			isIn=True
+			for e in E:
+				if  not Grammar._in(s,e):
+					isIn=False
+			if(isIn and len(s)==len(E)):
+				return True
+		return False
+	
+	def SetEquals(setA,setB):
+		isIn=True
+		for e in setB:
+			if  not Grammar._in(setA,e):
+				isIn=False
+
+		if(isIn and len(setA)==len(setB)):
+			return True
+		return False
+
+
+	def printLRElementSet(Set):
+		print("{")
+		for e in Set:
+			Grammar.printLRElement(e)
+		print("}")
+
+	def printLRElement(E):
+			print('['+str(E[0])+','+E[1]+']')
+
+
+
+	def getSetIndex(SetList,Set):
+		for i in range( len(SetList)):
+			if Grammar.SetEquals( SetList[i],Set):
+				return i
+		return -1
+
+	def LR1Table(self):
+		C=self.Elementos()
+		Table=[]
+		
+		for StatesSet in C:
+			Row={}
+			for symbol in self.VT+self.VN:
+				Row[symbol]=''
+			Table.append(Row)
+		
+
+		for i in range(len(C)):
+
+				for j  in range(len(C[i])):	
+
+
+					# CALCULO DE ACCIONES		
+					a=C[i][j][0].dotNextChar()
+					Alpha=C[i][j][0].getDotAlpha()
+					B=C[i][j][0].dotNextChar()
+					
+					# CONDICION A   !CORRECTO!					
+					if self.isPureTerminal(a) and a!='':
+						index=Grammar.getSetIndex( C,self.ir_a(C[i],a,self))
+						if index != -1:
+							Table[i][a]='d'+str(index)
+
+					# CONDICION B  !CORRECTA!
+					if B=='' :
+
+						z=-1
+						for k in range(len(self.Productions)):
+							prodAux=self.Productions[k]
+
+							if C[i][j][0].Right[0:len(C[i][j][0].Right)-1]==prodAux.Right:
+
+								print("---------------------------------------------prodWithDotAtEnd")
+								print(prodAux)
+								print("---------------------------------------------C[][][]")
+								print(C[i][j][0])
+								if k!=0:					
+									Table[i][C[i][j][1]]="r"+str(k)
+									print('r'+str(k)+'    con:'+str(C[i][j][1]))
+
+					#CONDICION C  !CORRECTO!
+					if Grammar._in(C[i],[self.Productions[0].dotInit().dotAdvance(),'$']):
+						print('jaja-----------------------------------------------------------------:')
+						print(self.Productions[0])
+						Table[i]['$']='Acc'
+
+					# TRANSICIONES IR_A    !CORRECTO!
+					for NT in self.VN:
+						index=Grammar.getSetIndex(C,self.ir_a(C[i],NT,self))
+						if index!= -1:
+							Table[i][NT]=str(index)
+
+		return Table
+
+
+
+	def belongsToLR1(self,strng):
+
+		Pila=[]
+		Pila.append(0)
+		ae=0
+		word=Util.tokenizeString(strng,self.VT)
+
+		if word!= False: 
+
+			word.append('$')
+			Table=self.LR1Table()
+			LogTable=[]
+
+			Action='start'
+			while Action!='Acc':
+				s=Pila[len(Pila)-1]
+				a=word[ae]
+
+
+				if self.isPureTerminal(a):
+					print(Pila)
+					prodEmmited=''
+					Action=Table[s][a]
+					print('Action:')
+					print(Action)
+					if Action!='':
+
+						logRow=[Pila[0:len(Pila)],word[ae:len(word)],Action]
+
+						if 'd' in Action:
+							Pila.append(a)
+							Pila.append(int(Action[1:len(Action)]))
+							ae+=1
+
+						if 'r' in Action:
+							m=int(Action[1:len(Action)])
+
+							mProd=self.Productions[m]
+							A=''.join(mProd.Left)
+
+							
+							print('prod m:'+str(mProd))
+							print('A:'+A)
+
+							for i in range(len(mProd.Right)*2):
+								Pila.pop()
+
+							Sprima=Pila[len(Pila)-1]
+							print('s`:'+str(Sprima))
+		
+							Pila.append(A)
+							Pila.append(int(Table[Sprima][A]))
+
+							prodEmmited=mProd
+							#To DO emitt production			
+							
+						logRow[2]=logRow[2]+'    '+str(prodEmmited)
+						LogTable.append(logRow)
+					
+					else:
+						print('Error@@@@@@')
+						return False	
+
+
+			return LogTable
+						
+		else:
+			print('string contains an unknown symbol ')
+			return False
+
+
+				
+
+
+
+
 
 
 
@@ -1034,7 +1312,6 @@ class Grammar:
 
 
 		
-
 
 
 

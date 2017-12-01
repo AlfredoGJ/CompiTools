@@ -154,7 +154,7 @@ class RootWidget(BoxLayout):
 
                 if myGrammar.Type == 'Regular Grammar':
 
-                    ER = myGrammar.genRegularExpression()
+                    ER = myGrammar.genReBgularExpression()
                     self.grammarInfo.text += '\nRegular Expresion: S--> ' + ' | '.join(ER[0])
                     self.logBox.text = ER[1]
 
@@ -167,6 +167,45 @@ class RootWidget(BoxLayout):
             else:
                 self.logBox.text = myGrammar
                 return False
+
+    def showLR1Table(self):
+        myGrammar=self.extractGrammar()
+        if myGrammar:
+            myGrammar.Primero()
+            myGrammar.Sig()
+
+            E=myGrammar.Elementos()
+            print("These are the Sets")
+            for e in E:
+                Grammar.printLRElementSet(e)
+            
+            Gp=myGrammar.copy()
+            Gp.Productions.insert(0,Production([Gp.Productions[0].Left[0]+'`'],[Gp.Productions[0].Left[0]]))
+            Gp.VT.append('$')
+
+            Table= Gp.LR1Table()
+
+            for el in Table:
+                print(el)
+                
+    def testStringLR1(self):
+        myGrammar=self.extractGrammar()
+        if myGrammar:
+            myGrammar.Primero()
+            myGrammar.Sig()
+            Gp=myGrammar.copy()
+            Gp.Productions.insert(0,Production([Gp.Productions[0].Left[0]+'`'],[Gp.Productions[0].Left[0]]))
+            Gp.VT.append('$')
+            result=Gp.belongsToLR1(self.testString.text)
+
+            if result!=False:
+                for row in result:
+                    print(row)
+
+   
+
+
+
 
 
     def primUndDemencia(self):
@@ -242,6 +281,27 @@ class RootWidget(BoxLayout):
                 for p in myGrammar.ProdsJoined:
                     print(p)
                 print('\n')
+
+                print("Test point insertion")
+                print(myGrammar.Productions[0].dotNextChar())
+                myGrammar.Productions[0].dotInit()
+
+                print("Alpha:")
+                print(myGrammar.Productions[0].getDotAlpha())
+                print("B:")
+                print(myGrammar.Productions[0].dotNextChar())
+                print("Betha:")
+                print(myGrammar.Productions[0].getDotBetha())
+                for i in range(10):
+
+                    myGrammar.Productions[0].dotAdvance()
+                    print("Alpha:")
+                    print(myGrammar.Productions[0].getDotAlpha())
+                    print("B:")
+                    print(myGrammar.Productions[0].dotNextChar())
+                    print("Betha:")
+                    print(myGrammar.Productions[0].getDotBetha())
+
 
                 if myGrammar.Type == 'Regular Grammar':
 

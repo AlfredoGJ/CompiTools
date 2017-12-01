@@ -87,10 +87,17 @@
                             on_press: root.insertEpsilon()
                             on_release: root.refocusTextInput()
                             # pos_hint: {'x':0,'y':.02}
-                        Button:
-                            text: 'Primero, Siguiente,Tabla'
+                        BoxLayout:
+                            orientation: 'horizontal'
                             size_hint: (1, .1)
-                            on_press: root.primUndDemencia()
+                            Button:
+                                text: 'Primero, Siguiente,Tabla'
+                                size_hint: (1, 1)
+                                on_press: root.primUndDemencia()
+                            Button:
+                                text: 'Table LR1'
+                                size_hint: (1, 1)
+                                on_press: root.showLR1Table()
                     
 
 
@@ -172,11 +179,18 @@
                                 allow_copy: True
                                 size_hint: (1, .1)
 
-                            Button:
-                                text:'Test String'
-                                size_hint: (1,.06)
-                                on_press: root.testStringOnGrammar()                            
+                            BoxLayout:
+                                size_hint: (1, .1)
 
+                                Button:
+                                    text:'Test String '
+                                    size_hint: (1,1)
+                                    on_press: root.testStringOnGrammar()       
+
+                                Button:
+                                    text:'Test String LR1'
+                                    size_hint: (1,1)
+                                    on_press: root.testStringLR1()   
                             # Button:
                             #     text:'Relleno'
                     
