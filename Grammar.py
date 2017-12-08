@@ -8,6 +8,9 @@ import Util
 logging.basicConfig(level=logging.DEBUG)
 
 class Grammar:
+	"""This class is used to represent a grammar, it contains a list of productions,
+	   a list of terminal symbols, a list of non terminal symbols, description, grammar type,
+	   'Primero' and 'Siguiente sets' """
 	NotTerminals=string.ascii_uppercase;
 	Terminals= string.ascii_lowercase+string.digits+string.punctuation+'ε' 
 
@@ -23,6 +26,7 @@ class Grammar:
 	SiguienteSet={}
 
 	def __init__(self):
+		""""Class constructor"""
 		VT=[]
 		VN=[] 
 		ProdsJoined=[]
@@ -33,29 +37,31 @@ class Grammar:
 
 
 	def copy(self):
-		 Aux=Grammar()
-		 Aux.VT=self.VT[0:len(self.VT)]
-		 Aux.VN=self.VN[0:len(self.VN)]
-		 Aux.PrimeroSet=self.PrimeroSet.copy()  #this section was comented, i dont know why
-		 Aux.SiguienteSet=self.SiguienteSet.copy() # but if something breaks coment it again
+		""" Method for making a dereferenced copy of the grammar, this means that the result of the method
+		is a Grammar with the same values but not the same references to the same objects"""
+		Aux=Grammar()
+		Aux.VT=self.VT[0:len(self.VT)]
+		Aux.VN=self.VN[0:len(self.VN)]
+		Aux.PrimeroSet=self.PrimeroSet.copy()  #this section was comented, i dont know why
+		Aux.SiguienteSet=self.SiguienteSet.copy() # but if something breaks coment it again
 
-		 Prods=[]
-		 for P in self.Productions:
+		Prods=[]
+		for P in self.Productions:
 		 	Prods.append(P.copy())
-		 Aux.Productions=Prods
+		Aux.Productions=Prods
 
-		 ja=[]
-		 for P in self.ProdsJoined:
+		ja=[]
+		for P in self.ProdsJoined:
 		 	ja.append(P.copy())
-		 Aux.ProdsJoined=ja
-		 return Aux
+		Aux.ProdsJoined=ja
+		return Aux
 
 
 
 		
 
 	def onlyOneNTinLeft(self):
-
+		"""Function to chech if a grammar contains only items of lenght 1 in the left part of the producion """
 		for P in self.Productions:
 			if len(P.Left)>1:
 				return False
@@ -63,7 +69,7 @@ class Grammar:
 
 
 	def clear(self):
-
+		"""Clears the following grammar attributes: Productions,VT,VN,description,ProdsJoined """
 		
 		self.Productions.clear()
 		self.VT.clear()
@@ -72,7 +78,7 @@ class Grammar:
 		self.ProdsJoined.clear()
 
 	def fromString(input_rules):
-
+		"""Generates a Grammar object from a text string"""
 		
 		lines=input_rules.split('\n')  		# Partimos la entrada en renglones
 
@@ -127,7 +133,8 @@ class Grammar:
 		return myNewGrammar
 
 	def findTermAndNotTerm(self):
-
+		"""Finds the symbols in the Grammar and clasifies them as terminal and non-terminal then updates
+		   the attributes VT and VN"""
 		for prod in self.Productions:
 
 			for symbol in prod.Left+prod.Right:
@@ -185,6 +192,7 @@ class Grammar:
 		return True
 		
 	def separateOperands(self,line):
+		"""Separates the Left Part and Right part of a string deleimited with '-->' """
 
 		parts=line.split("-->")   	# Separamos la cadena en la dos partes a la derecha y a la izquierda 
 									# de la secuencia -->
@@ -211,6 +219,7 @@ class Grammar:
 
 
 	def extractOperands(self,word,symbols):
+		"""Extracts the symbols of a string to form a part of a production"""
 
 		#self.LOG.debug('string received as operand {}'.format(word))
 
@@ -223,7 +232,7 @@ class Grammar:
 						
 						return self.extractOperands(word[i+1:len(word)],symbols)
 
-					elif word[i]  not in string.ascii_lowercase and word[i]!='`':  # modified for accepting prime derivations of the kind "E`"
+					elif word[i]  not in string.ascii_uppercase and word[i] not in string.ascii_lowercase and word[i]!='`':  # modified for accepting prime derivations of the kind "E`"
 					
 						return 'Delimitated words must only contain UPPERCASE symbols'
 					
@@ -241,6 +250,7 @@ class Grammar:
 
 
 	def processLine(self,line):
+		"""Pocesess a line of text to potentially generate a Production Object"""
 
 		parts=self.separateOperands(line)
 
@@ -276,7 +286,8 @@ class Grammar:
 			return parts
 
 	def gramaticType(self):
-
+		"""Clasifies the grammar based on its characteristics and returns a string describing the
+		   type of grammar"""
 		LeftCount=0
 		RightCount=0
 		AllNotTerminalsInLeft=True
@@ -306,6 +317,7 @@ class Grammar:
 
 
 	def genRegularExpression(self):
+		"""Generates a regular expression based on the productions of the grammar"""
 
 		# Step 1: this is already done, we got this in ProdsJoined, so we just copy it
 		logStr='Step #1\n\n'
@@ -355,7 +367,6 @@ class Grammar:
 			for strng in B[i].Right:                            # We check for recirsivity
 				if B[i].Left in strng:  		  				# and make the reducion
 					newRight=B[i].Right
-					# newRight.remove(strng)
 					reducedStr='{'+strng.strip(B[i].Left)+'}'
 					for k in range(len(newRight)):
 						newRight[k]=reducedStr+newRight[k]
@@ -446,6 +457,7 @@ class Grammar:
 		return [ER,logStr]			
 
 	def genPostFixed(ER):
+		"""Generates the post fixed expression of a given grammar passed as string and returns it as a string"""
 		print('ER-----------------:'+ER)
 		pF=''
 		tope=0
@@ -528,6 +540,8 @@ class Grammar:
 		return pF	
 
 	def genTreefromER(RE):
+		"""Generates a tree that represents a regular expression, The regular expression is sent as parameter
+		   with type string"""
 		operands='*|·+'
 		Pila=[]
 		#RE=Grammar.genRegularExpression()
@@ -568,8 +582,8 @@ class Grammar:
 		return Pila[0]
 
 	def sustitute(prod,prodList):
-		""" Sustitutes a Not Terminal symbol with its derivations when its found
-			in an element of the list"""
+		""" Sustitutes a Not Terminal symbol 'prod' with its derivations when its found
+			in an element of the list 'prodList'"""
 		print('i Receive')
 		print('prod:')
 		print(prod)
@@ -643,6 +657,7 @@ class Grammar:
 
 
 	def leftFactorize(self):
+		""" Apllies a left factorization algorithm to the Grammar """
 
 		newProds=[]
 		for P in self.ProdsJoined:
@@ -703,6 +718,9 @@ class Grammar:
 		return Alpha
 
 	def Primero(self):
+		"""Non recursive function to calculate all the 'Primero' sets in the grammar, this function calls
+		   the recursive function 
+		'primeroR'"""
 		self.PrimeroSet.clear()
 		primero=[]
 		for Nt in self.VN:
@@ -716,7 +734,8 @@ class Grammar:
 	
 
 	def primeroR(self, X):
-		"""Calculates the set 'First' for a given symbol based on the productions of the Grammar"""
+		"""Calculates the set 'Primero' for a given symbol based on the productions of the Grammar
+		   this function is recursive"""
 		primero=[]
 		if self.isPureTerminal(X):
 			return [X]
@@ -746,85 +765,86 @@ class Grammar:
 		return primero
 
 
-	def Siguiente(self):
-
-		self.SiguienteSet.clear()
-		for i in range(len(self.VN)):
-			if i==0:
-				self.SiguienteSet[self.VN[i]]=['$']
-			else:
-				self.SiguienteSet[self.VN[i]]=[]
+	# def Siguiente(self):
+	# 	""""""
+	# 	self.SiguienteSet.clear()
+	# 	for i in range(len(self.VN)):
+	# 		if i==0:
+	# 			self.SiguienteSet[self.VN[i]]=['$']
+	# 		else:
+	# 			self.SiguienteSet[self.VN[i]]=[]
 		 
 
-		for i in range(len(self.VN)):
-			if self.VN[i] not in self.SiguienteSet: #No se ha calculado siguiente para el NT[i]
-				self.siguienteR(self.VN[i])
+	# 	for i in range(len(self.VN)):
+	# 		if self.VN[i] not in self.SiguienteSet: #No se ha calculado siguiente para el NT[i]
+	# 			self.siguienteR(self.VN[i])
 
 
-	def siguienteR(self,X):			
+	# def siguienteR(self,X):			
 
-		print('Term:'+str(X))
-		if X not in self.SiguienteSet or X==self.VN[0]:
-			for Prod in self.ProdsJoined:
-				for Term in Prod.Right:			
-					NTpos= Term.find(X)
+	# 	print('Term:'+str(X))
+	# 	if X not in self.SiguienteSet or X==self.VN[0]:
+	# 		for Prod in self.ProdsJoined:
+	# 			for Term in Prod.Right:			
+	# 				NTpos= Term.find(X)
 
-					if NTpos!= -1 and  NTpos+len(X)<len(Term) and Term [NTpos+len(X)]!='`':
-						sigPos=NTpos+len(X)
+	# 				if NTpos!= -1 and  NTpos+len(X)<len(Term) and Term [NTpos+len(X)]!='`':
+	# 					sigPos=NTpos+len(X)
 
 						
-						A=Prod.Left
-						Alpha=Term[NTpos:sigPos]
-						B=Term[NTpos:sigPos]
-						Betha=Term[sigPos:len(Term)]
+	# 					A=Prod.Left
+	# 					Alpha=Term[NTpos:sigPos]
+	# 					B=Term[NTpos:sigPos]
+	# 					Betha=Term[sigPos:len(Term)]
 						
-						sig=[]
+	# 					sig=[]
 						
-						if X==self.VN[0] and '$' not in sig:
+	# 					if X==self.VN[0] and '$' not in sig:
 
-							sig.append('$')
+	# 						sig.append('$')
 
-						if Betha!='': # production with the form A--> αBβ 
-							print('Producion type: A->αBβ ')
-							print('A:'+A)
-							print('Alpha:'+Alpha)
-							print('B:'+B)
-							print('Betha:'+Betha)
+	# 					if Betha!='': # production with the form A--> αBβ 
+	# 						print('Producion type: A->αBβ ')
+	# 						print('A:'+A)
+	# 						print('Alpha:'+Alpha)
+	# 						print('B:'+B)
+	# 						print('Betha:'+Betha)
 
-							sig.extend(self.gimmePrim(Betha))
+	# 						sig.extend(self.gimmePrim(Betha))
 
 							
-							if 'ε' in sig:
-								sig.remove('ε')
-								if A==self.VN[0]:
-									sig.append('$')
-								else:
-									sig.extend(self.siguienteR(A))
-							print('Prim de '+Betha+' = '+str(sig))
-							self.SiguienteSet[B]=sig  # Here ends the procedure for this case
-							return sig
+	# 						if 'ε' in sig:
+	# 							sig.remove('ε')
+	# 							if A==self.VN[0]:
+	# 								sig.append('$')
+	# 							else:
+	# 								sig.extend(self.siguienteR(A))
+	# 						print('Prim de '+Betha+' = '+str(sig))
+	# 						self.SiguienteSet[B]=sig  # Here ends the procedure for this case
+	# 						return sig
 
-						else:  # production with the form A-->ab
-							print('Producion type: A->αB ')
-							print('A:'+A)
-							print('Alpha:'+Alpha)
-							print('B:'+B)
-							print('Betha:'+Betha)
-							if A==self.VN[0]:
-								sig.append('$')
-							else:
-								sig.extend(self.siguienteR(A))
-							print('Prim de '+Betha+' = '+str(sig))
-							self.SiguienteSet[B]=sig
-							return sig
+	# 					else:  # production with the form A-->ab
+	# 						print('Producion type: A->αB ')
+	# 						print('A:'+A)
+	# 						print('Alpha:'+Alpha)
+	# 						print('B:'+B)
+	# 						print('Betha:'+Betha)
+	# 						if A==self.VN[0]:
+	# 							sig.append('$')
+	# 						else:
+	# 							sig.extend(self.siguienteR(A))
+	# 						print('Prim de '+Betha+' = '+str(sig))
+	# 						self.SiguienteSet[B]=sig
+	# 						return sig
 
-		else:
-			return self.SiguienteSet[X]														
+	# 	else:
+	# 		return self.SiguienteSet[X]														
 			
 
 
 	def gimmePrim(self,Betha):
-		"""Finds primero for a string based on the existing primero"""
+		"""Finds 'Primero' set for a string based on the existing 'Primero' sets, if there is not primero 
+		   existing the function then calculate sit"""
 		# print('i receive as β :'+Betha)
 		primerosDeI=[]
 		prim=[]
@@ -868,6 +888,8 @@ class Grammar:
 
 
 	def Sig(self):
+		"""Calculates the 'siguiente' sets for the symbols in the grammar and updates this info in the
+		   attributes of the grammar"""
 
 		self.SiguienteSet.clear()
 		for i in range(len(self.VN)):
@@ -922,7 +944,8 @@ class Grammar:
 						
 
 	def tabla(self):
-
+		"""Calculates the table for the non recursive predictive syntactic analisys algorithm and 
+		   returns it on a list"""
 		Table={}
 		for col in self.VN:
 			Table[col]={}
@@ -965,6 +988,8 @@ class Grammar:
 
 
 	def findSymbols(strng):
+		"""Finds in a string the symbols of a grammar and returns a list with the symbols found and ordered 
+		   according to the string"""
 		symbols=[]
 		for i  in range(len(strng)):			
 			if strng[i]!= '`':
@@ -979,55 +1004,63 @@ class Grammar:
 
 
 	def belongsTo(self,strng):
-
+		"""Tests if a string send as parameter corresponds to the grammar using the non recursive predictive
+		   syntactic analysis algorithm """
 
 		self.Primero()
 		self.Sig()
 		Table=self.tabla()
 
 		Pila=['$',self.VN[0]]
-		strng+='$'
+		
+		word=Util.tokenizeString(strng,self.VT)
 		ae=0
 		X=Pila[len(Pila)-1]
 
 		logTable=[]
 
-		while X!='$':
+		if word!=False:
+			word.append('$')
+			while X!='$':
 
-			prodEmmited=''
-			X=Pila[len(Pila)-1]
+				prodEmmited=''
+				X=Pila[len(Pila)-1]
 
-			if self.isPureTerminal(X) or X=='$':
-				if X==strng[ae]:
-					prodEmmited=''
-					Pila.pop()
-					ae+=1
-				else:
-					 return False
-
-			else:
-				if  X in Table.keys():
-					if strng[ae] in Table[X].keys():
-						prod=Table[X][strng[ae]][1]
+				if self.isPureTerminal(X) or X=='$':
+					if X==word[ae]:
+						prodEmmited=''
 						Pila.pop()
-						symbols=Grammar.findSymbols(prod)
-						for i in reversed(range(len(symbols))):
-							if symbols[i]!='ε':
-								Pila.append(symbols[i])
-						prodEmmited='->'.join(Table[X][strng[ae]])
+						ae+=1
+					else:
+						 return False
+
+				else:
+					if  X in Table.keys():
+						if word[ae] in Table[X].keys():
+							prod=Table[X][word[ae]][1]
+							Pila.pop()
+							symbols=Grammar.findSymbols(prod)
+							for i in reversed(range(len(symbols))):
+								if symbols[i]!='ε':
+									Pila.append(symbols[i])
+							prodEmmited='->'.join(Table[X][word[ae]])
+						else:
+							return False
 					else:
 						return False
-				else:
-					return False
-			logRen=[Pila[0:len(Pila)],strng[ae:len(strng)],prodEmmited]
-			print(logRen)
-			logTable.append(logRen)
+				logRen=[Pila[0:len(Pila)],word[ae:len(word)],prodEmmited]
+				print(logRen)
+				logTable.append(logRen)
 
-		return logTable
+			return logTable
+		else:
+			return False
+
 
 
 	def CerraduraLR1(self,E,G):
-
+		"""Function to calculate 'cerradura' of a set of elements to be used for the LR1 algorithm, the funcion
+		   receives the set of elements and a augmented grammar"""
 		for e in E:
 
 			prod=e[0]
@@ -1067,6 +1100,7 @@ class Grammar:
 
 
 	def getProdsOf(self, NT):
+		"""Gets all the productions of a Non terminal symbl send as a string 'NT' and returns them on a list"""
 		result=[]
 		for p in self.Productions:
 			if p.Left[0]==NT:
@@ -1076,12 +1110,14 @@ class Grammar:
 
 
 	def _in(E,p):
+		"""Checks if an LR1 element 'p' is in a group of LR1 elements 'E' """
 		for e in E:
 			if p[1]==e[1] and p[0].Left==e[0].Left and p[0].Right==e[0].Right :
 					return True 
 		return False 
 
 	def ir_a(self, E, X,G):
+		"""Function to calculate the 'ir a' sets for the LR1 algorithm"""
 		J=[]
 		for e in E:
 			if e[0].dotNextChar()==X:
@@ -1092,6 +1128,7 @@ class Grammar:
 
 
 	def Elementos(self):
+		"""Calculates all the sets of elements (States) for the LR1 algorithm and returns them on a list"""
 		Gp=self.copy()
 		Gp.Productions.insert(0,Production([Gp.Productions[0].Left[0]+'`'],[Gp.Productions[0].Left[0]]))
 
@@ -1128,7 +1165,7 @@ class Grammar:
 
 
 	def isSetIn(self, sets, E):
-	
+		"""Checks if a set of  LR1 elements is in a list of sets of LR1 elements"""
 		for s in sets:
 			isIn=True
 			for e in E:
@@ -1139,6 +1176,7 @@ class Grammar:
 		return False
 	
 	def SetEquals(setA,setB):
+		"""Checks if a set of LR1 elements 'setA' is equivalent to another set of LR1 elements 'setB'"""
 		isIn=True
 		for e in setB:
 			if  not Grammar._in(setA,e):
@@ -1150,23 +1188,27 @@ class Grammar:
 
 
 	def printLRElementSet(Set):
+		"""Function that prints to console a set of LR1 elements"""
 		print("{")
 		for e in Set:
 			Grammar.printLRElement(e)
 		print("}")
 
 	def printLRElement(E):
-			print('['+str(E[0])+','+E[1]+']')
+		"""Prints to console a LR1 element"""
+		print('['+str(E[0])+','+E[1]+']')
 
 
 
 	def getSetIndex(SetList,Set):
+		"""Gets the index of an LR1 elements set 'Set' if it is found in a list 'SetList'  """
 		for i in range( len(SetList)):
 			if Grammar.SetEquals( SetList[i],Set):
 				return i
 		return -1
 
 	def LR1Table(self):
+		"""Generates the LR1 algorithm table based on the grammar and returns it on a list"""
 		C=self.Elementos()
 		Table=[]
 		
@@ -1227,6 +1269,7 @@ class Grammar:
 
 
 	def belongsToLR1(self,strng):
+		"""Tests if a string send as parameter corresponds to the grammar using the LR1 algorithm """
 
 		Pila=[]
 		Pila.append(0)

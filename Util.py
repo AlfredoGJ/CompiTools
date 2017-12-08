@@ -1,10 +1,10 @@
-#
-
 
 def tokenizeString(strng,symbolList):
- 	result=[]
+	"""Finds in a string 'strng' the symbols of a list 'symbolList' and returns them ordered acording 
+	   to the string on a list"""
+	result=[]
 
- 	while strng!='':
+	while strng!='':
  		oneFound=False
 	 	for s in symbolList:
 	 		strngAux=strng.replace(s,'',1)
@@ -14,6 +14,6 @@ def tokenizeString(strng,symbolList):
 	 			strng=strngAux
 	 	if not oneFound:	
  			return False
- 	return result
+	return result
 
 

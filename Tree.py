@@ -1,5 +1,6 @@
 import graphviz as gv
 class Tree:
+	"""Class that represents a binary tree"""
 	
 	
 	symbol=''
@@ -35,22 +36,25 @@ class Tree:
 
 
 	def __init__(self, initial):
+		"""Class constructor"""
 		self.symbol=initial
 		#self.C1=Tree
 		#self.C2=Tree
 
 	def fill_2(self,c1,c2):
+		"""Sets both child nodes of the tree to the tree"""
 		self.C1=Tree(c1)
 		self.C2=Tree(c2)
 
 
 	def fill_1(self,c1):
+		"""Sets the left child of the tree"""
 		self.C1=Tree(c1)
 
 
 	def printStart(self,caption,name):
 
-		
+		"""Start to printing the tree to an image file"""
 		g=gv.Graph(format='png')
 		#self.GraphStyle[0]['label']='Nopthing'
 		g.graph_attr.update(label=caption)
@@ -70,20 +74,17 @@ class Tree:
 
 
 	def apply_styles(graph):
-	    graph.graph_attr.update(
-	        ('graph' in Tree.GraphStyle and Tree.GraphStyle['graph']) or {}
-	    )
-	    graph.node_attr.update(
-	        ('nodes' in Tree.GraphStyle and Tree.GraphStyle['nodes']) or {}
-	    )
-	    graph.edge_attr.update(
-	        ('edges' in Tree.GraphStyle and Tree.GraphStyle['edges']) or {}
-	    )
-	    return graph
+		"""Apllies the visual style to the graphviz tree"""
+
+		graph.graph_attr.update(('graph' in Tree.GraphStyle and Tree.GraphStyle['graph']) or {})
+		graph.node_attr.update(('nodes' in Tree.GraphStyle and Tree.GraphStyle['nodes']) or {})
+		graph.edge_attr.update(('edges' in Tree.GraphStyle and Tree.GraphStyle['edges']) or {})
+		return graph
 
 		
 			
 	def printxt(self):
+		"""Prints to console the content of the tree"""
 
 		print(self.symbol)
 		if self.C1 is not None:
@@ -92,6 +93,7 @@ class Tree:
 			self.C2.printxt()
 
 	def print_it(node, g, cont):
+		"""Generates recursively the graphviz graph of the tree"""
 		g.node(str(len(cont)),node.symbol)
 		node.number=len(cont)
 		cont.append('i')

@@ -16,7 +16,8 @@
     leftFact:leftFact
     leftRecursion:leftRecursion
     testString:testString
-    
+    gButton:gButton
+    reButton:reButton
 
     #These are the auto provided ActionBar and Carousel, change them according
     #to your needs
@@ -30,24 +31,29 @@
             id: _action
             size_hint: 1,1
             pos_hint: {'top':1}
+
             ActionView:
                 use_separator: True
-                ActionPrevious:
-                    title: '                                GRAMMAR '
+                ActionPrevious: 
+                    title:''
                     with_previous: False
                 ActionOverflow:
                     disabled: True
-                # ActionButton:
-                    
-                #     text: 'Go To Slide 3'
-                #     on_release: carousel.index = 2
                 
                 ActionButton:
-                   
+                    id: gButton
+                    text: 'GRAMMAR'
+                    on_release: root.gotoGrammar(self)
+                    background_normal: ''
+                    background_color: (.2,.5,.9,1)
+                ActionButton:   
+                    id: reButton                
                     text: 'REGULAR EXPRESSIONS'
-                    on_release: carousel.index = 1
-                    background_color: (.4,.4,.48,1) if self.state == 'normal' else (0,0,.5,.4)
-                    background_normal: ""
+                    on_release: root.gotoRegEx(self) 
+                    background_normal: ''
+                    background_color: (0, 0, 0, 0)
+                    
+                
 
     BoxLayout:
         orientation: 'vertical'
@@ -57,7 +63,7 @@
             Carousel:
                 id: carousel
                 pos_hint: {'top': 0.9}
-                on_index: root.on_index(*args)
+                # on_index: root.on_index(*args)
                 BoxLayout:
                     orientation: 'horizontal'
 
@@ -93,7 +99,7 @@
                             Button:
                                 text: 'Primero, Siguiente,Tabla'
                                 size_hint: (1, 1)
-                                on_press: root.primUndDemencia()
+                                on_press: root.primSigTable()
                             Button:
                                 text: 'Table LR1'
                                 size_hint: (1, 1)
@@ -191,10 +197,7 @@
                                     text:'Test String LR1'
                                     size_hint: (1,1)
                                     on_press: root.testStringLR1()   
-                            # Button:
-                            #     text:'Relleno'
-                    
-
+                            
 
                                             
                 # BoxLayout:
@@ -202,6 +205,7 @@
                     # orientation: 'vertical'
                     direction: 'bottom'
                     id: regExCarousel
+                    
             
                     anchor_x: 'left'
                     BoxLayout:
@@ -244,6 +248,7 @@
                             Image:
                                 id:regExTreeImg
                                 size_hint: (1,1)
+                                
 
 
                         BoxLayout:
@@ -264,11 +269,13 @@
 
 
                     BoxLayout:
+                        orientation: 'vertical'
                         Image:
                             id: regExImage
-                BoxLayout:
-                    Button:
-                        text: 'Slide three'
+                        Button:
+                            text: 'Go Back'
+                            size_hint: (1, .15)
+                            on_press: regExCarousel.load_previous()
 
         Splitter:
             size_hint_y: .3

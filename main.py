@@ -12,9 +12,8 @@ import logging
 
 
 class RootWidget(BoxLayout):
-    '''This is the class representing your root widget.
-       By default it is inherited from BoxLayout,
-       you can use any other layout/widget depending on your usage.
+    '''This is the class representing the root widget.
+       By default it is inherited from BoxLayout
     '''
 
     cont1 = ObjectProperty(None)
@@ -23,7 +22,9 @@ class RootWidget(BoxLayout):
     carousel = ObjectProperty(None)
 
     def __init__(self, **kwargs):
+
         super(RootWidget, self).__init__(**kwargs)
+
         self.cont1 = actionbar.ContextualActionView(
             action_previous=actionbar.ActionPrevious(title='Go Back'))
         self.cont2 = actionbar.ContextualActionView(
@@ -47,33 +48,20 @@ class RootWidget(BoxLayout):
 
                     self.logBox.text+=str(r[0])+'                          '+str(r[1])+'                         '+str(r[2])+'\n'
             else:
-                self.logBox.text+="ERROR\nTHE STRING '"+self.testString.text+"' STRING DOESN'T CORRESPONDS TO THE GRAMMAR\n\n"
+                self.logBox.text+="ERROR\nTHE STRING '"+self.testString.text+"' DOESN'T CORRESPONDS TO THE GRAMMAR\n\n"
 
 
 
+    def gotoRegEx(self,value):
+        self.carousel.load_next()
+        value.background_color=(0,.8,.1,1)
+        self.gButton.background_color= (0,0,0,0)
 
-    def on_index(self, instance, value):
-        if value == 2:
-            self.action_bar.add_widget(self.cont2)
+    def gotoGrammar(self,value):
+        self.carousel.load_previous()
+        value.background_color=(.2,.5,.9,1)
+        self.reButton.background_color =(0,0,0,0)
 
-        elif value == 1:
-            if self.prev_index == 0:
-                self.action_bar.add_widget(self.cont1)
-
-            elif not self.from_actionbar:
-                try:
-                    self.action_bar.on_previous()
-                except:
-                    pass
-
-        elif self.from_actionbar is False:
-                try:
-                    self.action_bar.on_previous()
-                except:
-                    pass
-
-        self.prev_index = value
-        self.from_actionbar = False
 
     def on_previous(self, *args):
         self.from_actionbar = True
@@ -86,32 +74,35 @@ class RootWidget(BoxLayout):
         self.grammarInput.focus = True
 
     def ShowAFN(self):
-        AFN=Graph.fromPostFixed(Grammar.genPostFixed(self.regExInputBox.text))
-        self.regExImage.source=AFN.print('AFN')
-        self.regExImage.reload()
-        self.regExCarousel.load_next()
+        if self.regExInputBox.text !='':
+            AFN=Graph.fromPostFixed(Grammar.genPostFixed(self.regExInputBox.text))
+            self.regExImage.source=AFN.print('AFN')
+            self.regExImage.reload()
+            self.regExCarousel.load_next()
 
-        print('DEBUG')
-        for state in AFN.Nodes:
-            print('state: '+str(state))
-            print(AFN.cerraduraEpsilon([state],[state]))
+            print('DEBUG')
+            for state in AFN.Nodes:
+                print('state: '+str(state))
+                print(AFN.cerraduraEpsilon([state],[state]))
 
     def ShowAFD(self):
-        AFN=Graph.fromPostFixed(Grammar.genPostFixed(self.regExInputBox.text))
-        AFD=AFN.getAFDfromAFN()
-        self.logBox.text=AFD[1]
-        self.regExImage.source=AFD[0].print('AFD')
-        self.regExImage.reload()
-        self.regExCarousel.load_next()
+        if self.regExInputBox.text !='':
+            AFN=Graph.fromPostFixed(Grammar.genPostFixed(self.regExInputBox.text))
+            AFD=AFN.getAFDfromAFN()
+            self.logBox.text=AFD[1]
+            self.regExImage.source=AFD[0].print('AFD')
+            self.regExImage.reload()
+            self.regExCarousel.load_next()
 
 
     def ShowMinAFD(self):
-        AFN=Graph.fromPostFixed(Grammar.genPostFixed(self.regExInputBox.text))
-        AFD=AFN.getAFDfromAFN()
-        AFDMin=AFD[0].minimize()
-        self.regExImage.source=AFDMin.print('MinimizedAFD')
-        self.regExImage.reload()
-        self.regExCarousel.load_next()
+        if self.regExInputBox.text !='':
+            AFN=Graph.fromPostFixed(Grammar.genPostFixed(self.regExInputBox.text))
+            AFD=AFN.getAFDfromAFN()
+            AFDMin=AFD[0].minimize()
+            self.regExImage.source=AFDMin.print('MinimizedAFD')
+            self.regExImage.reload()
+            self.regExCarousel.load_next()
 
     def regExpressionCopy(self):
         self.regExpression.select_all()
@@ -169,6 +160,7 @@ class RootWidget(BoxLayout):
                 return False
 
     def showLR1Table(self):
+        self.logBox.text=''
         myGrammar=self.extractGrammar()
         if myGrammar:
             myGrammar.Primero()
@@ -184,11 +176,23 @@ class RootWidget(BoxLayout):
             Gp.VT.append('$')
 
             Table= Gp.LR1Table()
+            self.logBox.text+='THE TABLE FOR LR1 IS:\n\n'
+
+            for key in Table[0].keys():
+                self.logBox.text+=key+'                      '
+            self.logBox.text+='\n\n'
+
 
             for el in Table:
-                print(el)
+                el
+                for value in el.keys():
+                    self.logBox.text+=el[value]+'                       '
+                self.logBox.text+='\n'
+ 
+
                 
     def testStringLR1(self):
+        self.logBox.text=''
         myGrammar=self.extractGrammar()
         if myGrammar:
             myGrammar.Primero()
@@ -199,16 +203,19 @@ class RootWidget(BoxLayout):
             result=Gp.belongsToLR1(self.testString.text)
 
             if result!=False:
+                self.logBox.text+='THE STRING '+self.testString.text+' CORRESPONDS TO THE GRAMMAR\n\n '
                 for row in result:
+                    self.logBox.text+=str(row)+'\n'
                     print(row)
 
-   
+            else:
+                self.logBox.text+='THE STRING '+self.testString.text+'  DOES NOT CORRESPONDS TO THE GRAMMAR  :(\n\n '
 
 
 
 
 
-    def primUndDemencia(self):
+    def primSigTable(self):
         myGrammar=self.extractGrammar()
         if  myGrammar:
 
@@ -216,8 +223,9 @@ class RootWidget(BoxLayout):
                 for p in myGrammar.ProdsJoined:
                     print(p)
                     print('\n')
-
+                print('start prim')
                 p=myGrammar.Primero()
+                print('end prim')
                 for var in p:
                     print(var)
 
@@ -376,6 +384,7 @@ class RootWidget(BoxLayout):
 
 
 class MainApp(App):
+    title='CompiTools'
     '''This is the main class of your app.
        Define any app wide entities here.
        This class can be accessed anywhere inside the kivy app as,

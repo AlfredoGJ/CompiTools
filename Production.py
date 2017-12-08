@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class Production:
+		"""Class that represents a production of a grammar"""
 		Left=[]
 		Right=[]
 		def __init__(self,left,right):
@@ -8,11 +9,14 @@ class Production:
 			self.Right=right
 
 		def getLeftPart(self):
+			"""Returns the left part of the production"""
 			return self.Left
 		def getRightPart(self):
+			"""Returns the right part of the production"""
 			return self.Right
 
 		def Equals(self,other):
+			"""Check if this production is equivalent to other production"""
 			return self.Left==other.Left and self.Right==other.Right
 
 
@@ -32,6 +36,7 @@ class Production:
 			return string
 			
 		def copy(self):
+			"""Copy method for the Production object"""
 
 			if type(self.Left)!=list:
 				if type(self.Right)!=list:
@@ -46,6 +51,7 @@ class Production:
 					return Production(self.Left[:],self.Right)
 			
 		def factorize(self):
+			"""Factorizes the production"""
 
 			factors=[]
 			common=[]
@@ -69,14 +75,16 @@ class Production:
 			if len(factors)==1:
 				self.Right.append(factors[0]+A)
 
-		def dotInit(self):			
-				c=Production(self.Left[:],self.Right[:])
-				c.Right.insert(0,"·")
-				# print(c.Right)
-				# print(c.Left)
-				return c
+		def dotInit(self):	
+			"""Returns a production with a dot at the beginning"""		
+			c=Production(self.Left[:],self.Right[:])
+			c.Right.insert(0,"·")
+			# print(c.Right)
+			# print(c.Left)
+			return c
 
 		def dotAdvance(self):
+			"""Returns a production with the dot in the next position"""
 			c=Production(self.Left[:],self.Right[:])
 			if "·" in c.Right:
 				index=c.Right.index("·")
@@ -92,6 +100,7 @@ class Production:
 
 
 		def dotNextChar(self):
+			"""Returns the symbol ath the right of the dot"""
 			if "·" in self.Right:
 				index=self.Right.index("·")
 				if index+1<len(self.Right):
@@ -103,6 +112,7 @@ class Production:
 
 
 		def getDotAlpha(self):
+			"""Returns the symbol at the left of the dot"""
 			if "·" in self.Right:
 				index=self.Right.index("·")
 				if index>0:
@@ -113,6 +123,7 @@ class Production:
 				return False
 
 		def getDotBetha(self):
+			"""Returns the symbol at the second position at the right of the dot"""
 			if "·" in self.Right:
 				index=self.Right.index("·")
 				if index+2<len(self.Right):
@@ -124,6 +135,7 @@ class Production:
 
 
 		def getDotIndex(self):
+			"""Returns the index of the dot in the production"""
 			if "·" in self.Right:
 				return self.Right.index("·")
 			else:

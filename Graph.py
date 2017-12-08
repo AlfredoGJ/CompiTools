@@ -3,6 +3,7 @@ import string
 
 
 class Graph:
+    """Class used to represent a graph """ 
     Nodes = []
     Edges = []
     start = ''
@@ -13,7 +14,7 @@ class Graph:
         'graph': {
             'fontsize': '32',
             'fontcolor': 'white',
-            'bgcolor': '#333333',
+            'bgcolor': '#3343333',
             'rankdir': 'LR',
         },
         'nodes': {
@@ -33,6 +34,7 @@ class Graph:
         }}
 
     def __init__(self):
+        """Constructor of the class """
         self.Nodes = []
         self.Edges = []
         self.start = ''
@@ -40,6 +42,8 @@ class Graph:
         self.symbols=[]
 
     def apply_styles(graph):
+        """Apllies a visual style to the graph to be shown lates with graphviz"""
+
         graph.graph_attr.update(
             ('graph' in Graph.GraphStyle and Graph.GraphStyle['graph']) or {}
         )
@@ -52,6 +56,7 @@ class Graph:
         return graph
 
     def print(self, name):
+        """Prints the graph to an image file"""
 
         g1 = gv.Digraph(format='png')
 
@@ -72,6 +77,7 @@ class Graph:
         return filename
 
     def TRAN(c):
+        """Makes a graph transition with the given character """
         if len(c) > 1:
             return False
         else:
@@ -84,6 +90,7 @@ class Graph:
         return result
 
     def CAT(g1, g2):
+        """Makes a concatenation of two graphs and return the result"""
 
         result = Graph()
         G1 = g1.copy()
@@ -137,6 +144,7 @@ class Graph:
         return result
 
     def OR(g1, g2):
+        """Makes a new graph with the operation or between two other graphs"""
 
         G1 = g1.copy()
         G2 = g2.copy()
@@ -253,6 +261,7 @@ class Graph:
         return result
 
     def CERR_POS(g):
+        """Returns a graph with the operation of 'cerradura positiva' made of the graph passed as parameter """
 
         result = Graph()
         G = g.copy()
@@ -293,7 +302,7 @@ class Graph:
         return result
 
     def CERR_KLEENE(g):
-
+        """Returns a graph with the operation of 'cerradura positiva' made of the graph passed as parameter """
         result = Graph()
         G = g.copy()
         nodeCont = 1
@@ -333,10 +342,12 @@ class Graph:
         return result
 
     def printxt(self):
+        """Prints to console the content of the Graph"""
         print(self.Nodes)
         print(self.Edges)
 
     def copy(self):
+        """Returns a copy of the graph that rececives as parameter"""
         R = Graph()
         edges = []
 
@@ -355,6 +366,7 @@ class Graph:
         return R
 
     def fromPostFixed(PF):
+        """Generates a graph from a regular expression in its post fixed form """
         pila = []
         print('I received as PF: ' + PF)
         cont = 1
@@ -400,6 +412,7 @@ class Graph:
 
 
     def cerraduraEpsilon(self, States,accStates):
+        """Function to the algorithm 'Cerradura epsilon' used for the thompson algorithm """
         # newstates=States[0:len(States)]
         for s in States:
             for e in self.Edges:
@@ -415,6 +428,7 @@ class Graph:
 
 
     def mueve(self, States,Symbol):
+        """Function used in thompson algoritm"""
         statesList=[]
         for St in States:
             for Ed in self.Edges:
@@ -423,11 +437,13 @@ class Graph:
         return statesList
 
     def enlistSymbols(self ):
+        """Fills the attribute symbols with the symbols contained in this graph"""
         for e in self.Edges:
             if e[2] not in self.symbols and e[2]!='ε':
                 self.symbols.append(e[2])
 
     def getAFDfromAFN(self):
+        """Cretes an AFD from this graph and returns it"""
         debugStr=''
         result=Graph()
         States=[]
@@ -474,6 +490,7 @@ class Graph:
 
 
     def minimize(self):
+        """Creates a Minimum AFD from this graph and returns it"""
         result=Graph()
         acceptStatesSet=[]
         notAcceptStatesSet=[]
@@ -551,15 +568,15 @@ class Graph:
             
 
     def toWhichGroup(self,sets,state,symbol):
-       
-       endState=''
-       for N in self.Edges:
+        """Function used to calculate the state where a symbol leads in an AFD"""
+        endState=''
+        for N in self.Edges:
             if N[0]==state and N[2]== symbol:
                 endState=N[1]
-       if endState=='':
+        if endState=='':
             return-1
 
-       for i in range(len(sets)):
+        for i in range(len(sets)):
             if endState in sets[i]:
                 return i
 
